@@ -10,9 +10,18 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
-    '@nuxt/ui'
+    '@nuxt/ui',
+    'nuxt-studio',
   ],
   content: {
     experimental: { sqliteConnector: 'native' },
   },
+  studio: {
+    repository: {
+      provider: 'github',
+      owner: 'nirjan-dev',
+      repo: 'evergreen-plants-site',
+      branch: 'main',
+    }
+  }
 })
