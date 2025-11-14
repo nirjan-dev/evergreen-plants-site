@@ -1,0 +1,77 @@
+<template>
+  <section
+    id="products"
+    class="bg-cream py-10"
+  >
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex justify-between items-center mb-12">
+        <div>
+          <h2 class="text-4xl font-bold text-gray-900 mb-3">
+            Our Plants
+          </h2>
+          <p class="text-xl text-gray-600">
+            Discover your next green companion
+          </p>
+        </div>
+        <!-- <div class="flex gap-4">
+          <select class="px-6 py-3 rounded-lg border-2 border-gray-300 text-lg focus:border-sage focus:outline-none">
+            <option>All Categories</option>
+            <option>Indoor Plants</option>
+            <option>Outdoor Plants</option>
+            <option>Succulents</option>
+            <option>Flowering Plants</option>
+          </select>
+          <select class="px-6 py-3 rounded-lg border-2 border-gray-300 text-lg focus:border-sage focus:outline-none">
+            <option>Sort by</option>
+            <option>Price: Low to High</option>
+            <option>Price: High to Low</option>
+            <option>Newest</option>
+          </select>
+        </div> -->
+      </div>
+
+      <!-- Product Grid -->
+      <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div
+          v-for="(product, index) in products"
+          :key="index"
+          class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
+        >
+          <div class="bg-sand h-64 flex items-center justify-center">
+            <p class="text-gray-400">
+              [Plant Image]
+            </p>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">
+              {{ product.name }}
+            </h3>
+            <p class="text-gray-600 mb-4 text-lg">
+              {{ product.category }}
+            </p>
+            <div class="flex justify-between items-center">
+              <span class="text-2xl font-bold text-sage">{{ product.price }}</span>
+              <button class="bg-sage text-white px-5 py-2 rounded-lg hover:bg-sage-dark transition text-lg">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script lang="ts" setup>
+import { defineProps } from 'vue'
+
+interface Product {
+  name: string
+  category: string
+  price: string
+}
+
+const props = defineProps<{
+  products: Product[]
+}>()
+</script>

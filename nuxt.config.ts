@@ -1,7 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
 
   modules: [
     '@nuxt/content',
@@ -11,17 +9,30 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@nuxt/ui',
-    'nuxt-studio',
   ],
+  devtools: { enabled: true },
+  css: ['~/assets/css/main.css'],
   content: {
     experimental: { sqliteConnector: 'native' },
   },
-  studio: {
-    repository: {
-      provider: 'github',
-      owner: 'nirjan-dev',
-      repo: 'evergreen-plants-site',
-      branch: 'main',
-    }
-  }
+  ui: {
+    colorMode: false,
+    theme: {
+      colors: [
+        'primary',
+        'secondary',
+        'tertiary',
+        'info',
+        'success',
+        'warning',
+        'error',
+      ],
+    },
+  },
+  compatibilityDate: '2025-07-15',
+  eslint: {
+    config: {
+      stylistic: true,
+    },
+  },
 })
