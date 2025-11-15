@@ -38,19 +38,20 @@
           class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
         >
           <div class="bg-sand h-64 flex items-center justify-center">
-            <p class="text-gray-400">
-              [Plant Image]
-            </p>
+            <img
+              class="h-full w-full object-cover"
+              :src="product.imageLink"
+            >
           </div>
           <div class="p-6">
             <h3 class="text-xl font-bold text-gray-900 mb-2">
               {{ product.name }}
             </h3>
-            <p class="text-gray-600 mb-4 text-lg">
+            <!-- <p class="text-gray-600 mb-4 text-lg">
               {{ product.category }}
-            </p>
+            </p> -->
             <div class="flex justify-between items-center">
-              <span class="text-2xl font-bold text-sage">{{ product.price }}</span>
+              <span class="text-2xl font-bold text-sage">Rs. {{ product.price }}</span>
               <button class="bg-sage text-white px-5 py-2 rounded-lg hover:bg-sage-dark transition text-lg">
                 Add to Cart
               </button>
@@ -64,14 +65,9 @@
 
 <script lang="ts" setup>
 import { defineProps } from 'vue'
+import type { Product } from '~~/shared/types/product.types'
 
-interface Product {
-  name: string
-  category: string
-  price: string
-}
-
-const props = defineProps<{
+defineProps<{
   products: Product[]
 }>()
 </script>

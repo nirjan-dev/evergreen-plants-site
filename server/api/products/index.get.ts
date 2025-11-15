@@ -1,25 +1,24 @@
 import pbClient from '~~/server/utils/pb'
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  description?: string
-  image: string
-  title: string
-  stock: number
-  is_featured?: boolean
-  is_new?: boolean
-  gallery?: string[]
-  slug: string
-}
+import type { BaseProduct } from '~~/shared/types/product.types'
+import { getProductImageLink } from '~~/shared/utils/image'
 
 export default defineEventHandler(async () => {
   try {
-    const pageResult = await pbClient.collection<Product>('products').getFullList()
+    const pageResult = await pbClient.collection<BaseProduct>('products').getFullList()
+
+    if (!pageResult) {
+      throw createError({
+        message: 'no products found',
+        statusCode: 404,
+      })
+    }
+
     return {
       statusCode: 200,
-      products: pageResult,
+      products: pageResult.map(product => ({
+        ...product,
+        imageLink: getProductImageLink(product.image, product.id),
+      })),
     }
   }
   catch (e) {
