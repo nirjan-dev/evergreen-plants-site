@@ -1,73 +1,71 @@
-<script lang="ts">
+<script setup lang="ts">
+import type { NavigationMenuItem } from '@nuxt/ui'
+
+const items = computed<NavigationMenuItem[]>(() => [
+  {
+    label: 'Home',
+    to: '/',
+  },
+  {
+    label: 'About',
+    to: '/about',
+  },
+  {
+    label: 'Contact',
+    to: '/contact',
+  },
+])
 </script>
 
 <template>
-  <!-- HEADER / NAVIGATION -->
-  <header class="shadow-sm sticky top-0 z-50 bg-primary-50">
-    <nav class="max-w-7xl mx-auto px-6 py-5">
-      <div class="flex justify-between items-center">
-        <!-- Logo -->
-        <nuxt-link
-          to="/"
-          class="flex items-center space-x-3"
-        >
-          <div>
-            <img
-              src="/images/logo.jpeg"
-              alt="Logo"
-              class="w-12 h-12 rounded-full"
-            >
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold ">
-              EVERGREEN
-            </h1>
-            <p class="text-sm ">
-              Plant Nursery
-            </p>
-          </div>
-        </nuxt-link>
-
-        <!-- Navigation Links -->
-        <div class="hidden md:flex items-center space-x-8">
-          <nuxt-link
-            to="/"
-            class="active-page text-lg hover:-light transition"
-          >Home</nuxt-link>
-          <a
-            href="#products"
-            class="text-lg hover: transition"
-          >Shop</a>
-          <a
-            href="#about"
-            class="text-lg hover: transition"
-          >About</a>
-          <a
-            href="#contact"
-            class="text-lg hover: transition"
-          >Contact</a>
-          <UButton>
-            Cart (0)
-          </UButton>
-        </div>
-
-        <!-- Mobile Menu Button -->
-        <button class="md:hidden">
-          <svg
-            class="w-8 h-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+  <UHeader
+    :toggle="{
+      color: 'primary',
+      variant: 'subtle',
+      class: 'rounded-full',
+      size: 'xl',
+    }"
+    mode="slideover"
+  >
+    <template #left>
+      <nuxt-link
+        class="inline-flex gap-2 items-center"
+        to="/"
+      >
+        <div class="rounded-full h-14 w-14 bg-primary-950">
+          <img
+            src="/images/logo-transparent.png"
+            class="hfull w-full"
+            alt=""
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
-      </div>
-    </nav>
-  </header>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-extrabold text-xl lg:text-2xl text-primary-900">Evergreen</span>
+          <span class="text-sm lg:text-base text-primary-900">Plant Nursery</span>
+        </div>
+      </nuxt-link>
+    </template>
+
+    <UNavigationMenu
+      :items="items"
+    />
+
+    <template #right>
+      <UButton
+        icon="i-heroicons-shopping-cart"
+        size="sm"
+        class="mr-2 lg:mr-0"
+      >
+        Cart (0)
+      </UButton>
+    </template>
+
+    <template #body>
+      <UNavigationMenu
+        :items="items"
+        orientation="vertical"
+        class="-mx-2.5"
+      />
+    </template>
+  </UHeader>
 </template>
