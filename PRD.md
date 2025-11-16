@@ -28,9 +28,8 @@
 ### 3. Technical Requirements
 
 #### 3.1 Core Features (MVP)
-- **Bilingual Support:** English and Nepali with language toggle
 - **Product Catalog:** 10-30 plants with basic information
-- **Inventory Management:** Real-time stock display
+- **Inventory Management:** Real-time stock display (only for admins for now and not to end users)
 - **Location-based Delivery Pricing:** Based on distance from Jhapa and product weight
 - **Mobile-first Responsive Design:** Optimized for older users
 - **Simple Admin Dashboard:** For non-technical business owner
@@ -117,13 +116,13 @@ Each plant product should include:
 #### 5.4 Tech stack
 - Nuxt 4 for fullstack framework using node.js 24 (with typescript)
 - Vue.js 3 frontend framework
-- Nuxt UI as the UI framework and TailwindCSS for styling
-- Nuxt Content with Nuxt Studio (alpha) for content management
-- Key Nuxt modules used: nuxt content, nuxt eslint, nuxt hints, nuxt scripts, nuxt test-utils, nuxt image and nuxt vue
+- Nuxt UI 4 as the UI framework and TailwindCSS 4 for styling
+- Pocketbase for content management
+- Key Nuxt modules used: nuxt eslint, nuxt hints, nuxt scripts, nuxt test-utils, nuxt image.
 - Eslint for linting (pnpm lint and pnpm lint:fix for checks)
 - vue-tsc for typechecking (pnpm typecheck for type checking)
 - Fly.io for hosting and deployment as a SSR nuxt 4 app.
-
+- Nitroserver (with nuxt 4 API routes) for backend features
 
 ### 6. Content Requirements
 
@@ -180,6 +179,7 @@ Each plant product should include:
 
 #### 9.2 Phase 3 Features
 - Plant care reminders
+- **Bilingual Support:** English and Nepali with language toggle
 - Seasonal product recommendations
 - Customer reviews and ratings
 - Social media integration

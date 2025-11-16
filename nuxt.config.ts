@@ -2,7 +2,6 @@
 export default defineNuxtConfig({
 
   modules: [
-    '@nuxt/content',
     '@nuxt/eslint',
     '@nuxt/hints',
     '@nuxt/image',
@@ -12,9 +11,6 @@ export default defineNuxtConfig({
   ],
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
-  content: {
-    experimental: { sqliteConnector: 'native' },
-  },
   ui: {
     colorMode: false,
     theme: {

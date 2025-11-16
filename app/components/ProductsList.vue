@@ -81,7 +81,6 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue'
 import type { Product } from '~~/shared/types/product.types'
 
 defineProps<{

@@ -14,7 +14,7 @@
               class="w-full h-full object-cover rounded-2xl"
             >
           </div>
-          <div class="grid grid-cols-4 gap-4">
+          <!-- <div class="grid grid-cols-4 gap-4">
             <div class="bg-sand rounded-lg h-24 flex items-center justify-center">
               <p class="text-gray-400 text-sm">
                 [Thumb]
@@ -35,7 +35,7 @@
                 [Thumb]
               </p>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- Product Info -->
