@@ -1,15 +1,15 @@
 <template>
   <section
     id="products"
-    class="bg-cream py-10"
+    class="bg-neutral-100 py-8 lg:py-16"
   >
     <div class="max-w-7xl mx-auto px-6">
       <div class="flex justify-between items-center mb-12">
         <div>
-          <h2 class="text-4xl font-bold text-gray-900 mb-3">
+          <h2 class="text-4xl font-bold text-neutral-900 mb-3">
             Our Plants
           </h2>
-          <p class="text-xl text-gray-600">
+          <p class="text-xl text-neutral-600">
             Discover your next green companion
           </p>
         </div>
@@ -35,26 +35,43 @@
         <div
           v-for="(product, index) in products"
           :key="index"
-          class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
+          class="bg-neutral-50 grid gap-2 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
         >
-          <div class="bg-sand h-64 flex items-center justify-center">
+          <div class="h-64 flex items-center justify-center">
             <img
               class="h-full w-full object-cover"
               :src="product.imageLink"
             >
           </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">
+          <div class="px-6 py-4">
+            <h3 class="text-2xl font-bold text-neutral-900 mb-1">
               {{ product.name }}
             </h3>
-            <!-- <p class="text-gray-600 mb-4 text-lg">
+            <!-- <p class="text-neutral-600 mb-4 text-lg">
               {{ product.category }}
             </p> -->
             <div class="flex justify-between items-center">
-              <span class="text-2xl font-bold text-sage">Rs. {{ product.price }}</span>
-              <button class="bg-sage text-white px-5 py-2 rounded-lg hover:bg-sage-dark transition text-lg">
-                Add to Cart
-              </button>
+              <span class="text-2xl font-bold text-primary-700">रू&nbsp;{{ product.price }}</span>
+            </div>
+
+            <div class="flex flex-col text-center gap-2 mt-3">
+              <UButton
+                icon="heroicons:shopping-cart"
+                class="justify-center cursor-pointer"
+                size="lg"
+              >
+                Add&nbsp;to&nbsp;Cart
+              </UButton>
+
+              <UButton
+                :to="`/products/${product.slug}`"
+                variant="outline"
+                size="lg"
+                class="justify-center"
+                icon="heroicons:eye"
+              >
+                View Details
+              </UButton>
             </div>
           </div>
         </div>

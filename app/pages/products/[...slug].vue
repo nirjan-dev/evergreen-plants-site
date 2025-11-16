@@ -1,67 +1,148 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <div v-if="pending" class="text-center">
-      <p>Loading product details...</p>
-    </div>
-    <div v-else-if="error || !product" class="text-center text-red-500">
-      <p>Sorry, we couldn't find that product. It might not exist.</p>
-      <NuxtLink to="/" class="text-blue-500 hover:underline mt-4 inline-block">Go back to all plants</NuxtLink>
-    </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-      <!-- Product Image Gallery -->
-      <div class="aspect-square">
-        <img :src="product.meta.image" :alt="`Image of ${product.meta.name}`" class="w-full h-full object-cover rounded-lg shadow-md">
-        <!-- A simple gallery could be added here later by iterating over an array of images -->
-      </div>
+  <section
+    id="product-detail"
+    class="bg-white py-20"
+  >
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid md:grid-cols-2 gap-12">
+        <!-- Product Image -->
+        <div>
+          <div class="bg-sand rounded-2xl h-96 mb-6 flex items-center justify-center">
+            <img
+              :src="product?.imageLink"
+              :alt="product?.name"
+              class="w-full h-full object-cover rounded-2xl"
+            >
+          </div>
+          <div class="grid grid-cols-4 gap-4">
+            <div class="bg-sand rounded-lg h-24 flex items-center justify-center">
+              <p class="text-gray-400 text-sm">
+                [Thumb]
+              </p>
+            </div>
+            <div class="bg-sand rounded-lg h-24 flex items-center justify-center">
+              <p class="text-gray-400 text-sm">
+                [Thumb]
+              </p>
+            </div>
+            <div class="bg-sand rounded-lg h-24 flex items-center justify-center">
+              <p class="text-gray-400 text-sm">
+                [Thumb]
+              </p>
+            </div>
+            <div class="bg-sand rounded-lg h-24 flex items-center justify-center">
+              <p class="text-gray-400 text-sm">
+                [Thumb]
+              </p>
+            </div>
+          </div>
+        </div>
 
-      <!-- Product Details -->
-      <div class="flex flex-col">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-800">{{ product.meta.name }}</h1>
-
-        <p class="text-2xl font-semibold text-gray-700 mt-4">
-          Rs. {{ product.meta.price }}
-        </p>
-
-        <div class="mt-4 text-sm font-medium">
-          <p v-if="product.meta.stock > 0" class="text-green-600">
-            {{ product.meta.stock }} in stock
+        <!-- Product Info -->
+        <div>
+          <!-- <p class="text-sage font-semibold text-xl mb-3">
+            Indoor Plant
+          </p> -->
+          <h2 class="text-4xl font-bold text-gray-900 mb-4">
+            {{ product?.title }}
+          </h2>
+          <!-- <div class="flex items-center mb-6">
+            <div class="flex text-yellow-500 text-2xl">
+              ★★★★★
+            </div>
+            <span class="text-gray-600 ml-3 text-lg">(24 reviews)</span>
+          </div> -->
+          <p class="text-3xl font-bold text-sage mb-8">
+            रू {{ product?.price }}
           </p>
-          <p v-else class="text-red-500">
-            Out of stock
-          </p>
-        </div>
 
-        <div class="prose mt-6">
-          <ContentRenderer :value="product" />
-        </div>
+          <div class="mb-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+              Description
+            </h3>
+            <p class="text-lg text-gray-600 leading-relaxed">
+              {{ product?.description }}
+            </p>
+          </div>
 
-        <div class="mt-auto pt-6">
-          <button
-            :disabled="product.meta.stock <= 0"
-            class="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-green-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            Add to Cart
-          </button>
+          <!-- <div class="mb-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">
+              Care Instructions
+            </h3>
+            <ul class="space-y-3 text-lg text-gray-600">
+              <li class="flex items-start">
+                <span class="text-sage mr-3 text-2xl">•</span>
+                <span>Bright, indirect sunlight</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-sage mr-3 text-2xl">•</span>
+                <span>Water when top 2 inches of soil is dry</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-sage mr-3 text-2xl">•</span>
+                <span>Likes humid environments</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-sage mr-3 text-2xl">•</span>
+                <span>Feed monthly during growing season</span>
+              </li>
+            </ul>
+          </div> -->
+
+          <div class="mb-8">
+            <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity</label>
+            <div class="flex items-center gap-4">
+              <button class="w-12 h-12 border-2 border-gray-300 rounded-lg hover:border-sage text-xl">
+                -
+              </button>
+              <span class="text-2xl font-semibold px-6">1</span>
+              <button class="w-12 h-12 border-2 border-gray-300 rounded-lg hover:border-sage text-xl">
+                +
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <UButton
+              size="xl"
+              class="justify-center"
+              icon="i-heroicons-shopping-cart"
+            >
+              Add to Cart
+            </UButton>
+            <!-- <button class="w-16 h-16 border-2 border-sage text-sage rounded-lg hover:bg-sage hover:text-white transition">
+              <svg
+                class="w-6 h-6 mx-auto"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            </button> -->
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-
-
-
 const route = useRoute()
 const slug = route.params.slug?.toString().replace(/,/g, '/') ?? ''
 
-const { data: product, pending, error } = await useAsyncData(`product-${slug}`, () => {
-  return queryCollection('content')
-    .path(`/products/${slug}`)
-    .first()
+const { data, error } = await useFetch('/api/products/get-product-by-slug', {
+  params: {
+    slug,
+  },
 })
-
-if (error.value && !product.value) {
+const product = data.value?.product
+if (error.value && !product) {
   console.error(`Error fetching product with slug: ${slug}`, error.value)
 }
 </script>

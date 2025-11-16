@@ -30,6 +30,13 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: '2025-07-15',
+  nitro: {
+    esbuild: {
+      options: {
+        target: 'esnext',
+      },
+    },
+  },
   eslint: {
     config: {
       stylistic: true,

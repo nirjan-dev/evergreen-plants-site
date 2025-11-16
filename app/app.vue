@@ -1,7 +1,7 @@
 <template>
   <UApp>
     <MainHeader />
-    <main class="min-h-screen">
+    <main>
       <NuxtPage />
     </main>
     <MainFooter />

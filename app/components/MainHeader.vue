@@ -7,10 +7,13 @@
     <nav class="max-w-7xl mx-auto px-6 py-5">
       <div class="flex justify-between items-center">
         <!-- Logo -->
-        <div class="flex items-center space-x-3">
-          <div class="w-12 h-12  rounded-full flex items-center justify-center">
+        <nuxt-link
+          to="/"
+          class="flex items-center space-x-3"
+        >
+          <div>
             <img
-              src="/images/logo.png"
+              src="/images/logo.jpeg"
               alt="Logo"
               class="w-12 h-12 rounded-full"
             >
@@ -23,14 +26,14 @@
               Plant Nursery
             </p>
           </div>
-        </div>
+        </nuxt-link>
 
         <!-- Navigation Links -->
         <div class="hidden md:flex items-center space-x-8">
-          <a
-            href="#home"
+          <nuxt-link
+            to="/"
             class="active-page text-lg hover:-light transition"
-          >Home</a>
+          >Home</nuxt-link>
           <a
             href="#products"
             class="text-lg hover: transition"
