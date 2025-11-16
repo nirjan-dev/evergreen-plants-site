@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 
+const cartStore = useCartStore()
+
 const items = computed<NavigationMenuItem[]>(() => [
   {
     label: 'Home',
@@ -52,11 +54,12 @@ const items = computed<NavigationMenuItem[]>(() => [
 
     <template #right>
       <UButton
+        to="/cart"
         icon="i-heroicons-shopping-cart"
         size="sm"
         class="mr-2 lg:mr-0"
       >
-        Cart (0)
+        Cart ({{ cartStore.itemCount }})
       </UButton>
     </template>
 

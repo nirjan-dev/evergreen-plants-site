@@ -59,6 +59,7 @@
                 icon="heroicons:shopping-cart"
                 class="justify-center cursor-pointer"
                 size="lg"
+                @click="handleAddToCart(product)"
               >
                 Add&nbsp;to&nbsp;Cart
               </UButton>
@@ -83,7 +84,20 @@
 <script lang="ts" setup>
 import type { Product } from '~~/shared/types/product.types'
 
+const cartStore = useCartStore()
+const toast = useToast()
+
 defineProps<{
   products: Product[]
 }>()
+
+function handleAddToCart(product: Product) {
+  cartStore.addToCart({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    image: product.imageLink,
+  })
+  toast.add({ title: `${product.name} added to cart`, icon: 'heroicons:check-circle' })
+}
 </script>

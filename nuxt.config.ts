@@ -2,6 +2,8 @@
 export default defineNuxtConfig({
 
   modules: [
+    '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
     '@nuxt/eslint',
     '@nuxt/hints',
     '@nuxt/image',
@@ -37,5 +39,8 @@ export default defineNuxtConfig({
     config: {
       stylistic: true,
     },
+  },
+  piniaPluginPersistedstate: {
+    storage: 'localStorage',
   },
 })

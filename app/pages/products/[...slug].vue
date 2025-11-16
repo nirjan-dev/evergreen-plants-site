@@ -92,13 +92,19 @@
           <div class="mb-8">
             <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity</label>
             <div class="flex items-center gap-4">
-              <button class="w-12 h-12 border-2 border-gray-300 rounded-lg hover:border-sage text-xl">
+              <UButton
+                class="w-12 h-12 border-2 border-gray-300 rounded-lg hover:border-sage text-xl justify-center"
+                @click="decrementQuantity"
+              >
                 -
-              </button>
-              <span class="text-2xl font-semibold px-6">1</span>
-              <button class="w-12 h-12 border-2 border-gray-300 rounded-lg hover:border-sage text-xl">
+              </UButton>
+              <span class="text-2xl font-semibold px-6">{{ quantity }}</span>
+              <UButton
+                class="w-12 h-12 border-2 border-gray-300 rounded-lg hover:border-sage text-xl justify-center"
+                @click="incrementQuantity"
+              >
                 +
-              </button>
+              </UButton>
             </div>
           </div>
 
@@ -107,6 +113,7 @@
               size="xl"
               class="justify-center"
               icon="i-heroicons-shopping-cart"
+              @click="handleAddToCart(product)"
             >
               Add to Cart
             </UButton>
@@ -133,17 +140,52 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import type { Product } from '~~/shared/types/product.types'
+
 const route = useRoute()
 const slug = route.params.slug?.toString().replace(/,/g, '/') ?? ''
+
+const cartStore = useCartStore()
+const toast = useToast()
+const quantity = ref(1)
 
 const { data, error } = await useFetch('/api/products/get-product-by-slug', {
   params: {
     slug,
   },
 })
-const product = data.value?.product
+const product: Product | null | undefined = data.value?.product
 if (error.value && !product) {
   console.error(`Error fetching product with slug: ${slug}`, error.value)
+}
+
+function incrementQuantity() {
+  quantity.value++
+}
+
+function decrementQuantity() {
+  if (quantity.value > 1) {
+    quantity.value--
+  }
+}
+
+function handleAddToCart(productData: Product | null | undefined) {
+  if (!productData) {
+    return
+  }
+
+  const productForCart: Omit<CartItem, 'quantity'> = {
+    id: productData.id,
+    name: productData.title,
+    price: productData.price,
+    image: productData.imageLink,
+  }
+
+  for (let i = 0; i < quantity.value; i++) {
+    cartStore.addToCart(productForCart)
+  }
+  toast.add({ title: `${quantity.value} x ${productForCart.name} added to cart`, icon: 'heroicons:check-circle' })
 }
 </script>
 
