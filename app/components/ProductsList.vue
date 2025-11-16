@@ -1,7 +1,7 @@
 <template>
   <section
-    id="products"
-    class="bg-neutral-100 py-8 lg:py-16"
+    id="plants"
+    class="bg-neutral-100 py-16 lg:py-24"
   >
     <div class="max-w-7xl mx-auto px-6">
       <div class="flex justify-between items-center mb-12">
