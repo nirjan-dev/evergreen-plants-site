@@ -3,9 +3,9 @@
 
 ### 1. Project Overview
 
-**Business Name:** Evergreen Plant Nursery  
-**Project Goal:** Create a simple eCommerce website to reduce manual customer support and streamline plant sales for a nursery business in Nepal  
-**Target Audience:** Older Nepali people who discover the business through TikTok  
+**Business Name:** Evergreen Plant Nursery
+**Project Goal:** Create a simple eCommerce website to reduce manual customer support and streamline plant sales for a nursery business in Nepal
+**Target Audience:** Older Nepali people who discover the business through TikTok
 
 ### 2. Business Requirements
 
@@ -99,7 +99,7 @@ Each plant product should include:
 - **Platform:** Fly.io
 - **Scaling:** Auto-scaling with scale-to-zero for cost management
 - **Performance:** Fast loading for mobile users in Nepal
- 
+
 #### 5.2 Admin Interface Requirements
 - Simple, intuitive design for non-technical user
 - Basic product management (CRUD operations)

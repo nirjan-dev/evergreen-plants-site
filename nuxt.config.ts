@@ -38,6 +38,7 @@ export default defineNuxtConfig({
   eslint: {
     config: {
       stylistic: true,
+      standalone: false,
     },
   },
   piniaPluginPersistedstate: {

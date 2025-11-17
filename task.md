@@ -38,15 +38,15 @@ This document outlines the tasks required to implement the shopping cart feature
   ```typescript
   // types/product.ts
   export interface Product {
-    id: string;
-    name: string;
-    price: number;
-    image: string; // URL to the image
+    id: string
+    name: string
+    price: number
+    image: string // URL to the image
     // Add other relevant product fields
   }
 
   export interface CartItem extends Product {
-    quantity: number;
+    quantity: number
   }
   ```
 
@@ -104,7 +104,7 @@ This document outlines the tasks required to implement the shopping cart feature
   - [ ] Add a "Checkout" `UButton` that is prominent.
   - [ ] Add a checkout form with name, phone number, location (dropdown of supported location), email (optional), payment method (upload payment proof or pay later), prefered contact method (where to reach out if needed, whatsapp, tiktok, etc)
   - [ ] when payment proof is selected it should show an image of a QR code which they can use to pay and then have an image upload field for the screenshot of their payment
-  
+
 - [ ] **Order API**
   - [ ] create nuxt API to handle an order submission, should validate the user input and show appropriate error messages
   - [ ] the order should be created as a pocketbase collection with the right data

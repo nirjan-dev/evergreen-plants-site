@@ -1,11 +1,11 @@
-import { getPbClient } from '~~/server/utils/pb'
 import type { BaseProduct } from '~~/shared/types/product.types'
+import { getPbClient } from '~~/server/utils/pb'
 import { getProductImageLink } from '~~/shared/utils/image'
 
 export default defineEventHandler(async (event) => {
   const { slug } = getQuery(event)
 
-  if (!slug) {
+  if (typeof slug !== 'string') {
     throw createError({
       message: 'no slug provided',
       statusCode: 400,
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   try {
     const pbClient = await getPbClient()
     const pageResult = await pbClient.collection<BaseProduct>('products').getFirstListItem(`slug="${slug}"`)
-    if (!pageResult) {
+    if (!pageResult?.id) {
       throw createError({
         message: 'no product found',
         statusCode: 404,

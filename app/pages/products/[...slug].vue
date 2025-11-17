@@ -1,3 +1,53 @@
+<script setup lang="ts">
+import type { Product } from '~~/shared/types/product.types'
+import { ref } from 'vue'
+
+const route = useRoute()
+const slug = route.params.slug?.toString().replace(/,/g, '/') ?? ''
+
+const cartStore = useCartStore()
+const toast = useToast()
+const quantity = ref(1)
+
+const { data, error } = await useFetch('/api/products/get-product-by-slug', {
+  params: {
+    slug,
+  },
+})
+const product: Product | null | undefined = data.value?.product
+if (error.value && !product) {
+  console.error(`Error fetching product with slug: ${slug}`, error.value)
+}
+
+function incrementQuantity() {
+  quantity.value++
+}
+
+function decrementQuantity() {
+  if (quantity.value > 1) {
+    quantity.value--
+  }
+}
+
+function handleAddToCart(productData: Product | null | undefined) {
+  if (!productData) {
+    return
+  }
+
+  const productForCart: Omit<CartItem, 'quantity'> = {
+    id: productData.id,
+    name: productData.title,
+    price: productData.price,
+    image: productData.imageLink,
+  }
+
+  for (let i = 0; i < quantity.value; i++) {
+    cartStore.addToCart(productForCart)
+  }
+  toast.add({ title: `${quantity.value} x ${productForCart.name} added to cart`, icon: 'heroicons:check-circle' })
+}
+</script>
+
 <template>
   <section
     id="product-detail"
@@ -90,7 +140,7 @@
           </div> -->
 
           <div class="mb-8">
-            <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity</label>
+            <span class="block text-lg font-semibold text-gray-900 mb-3">Quantity</span>
             <div class="flex items-center gap-4">
               <UButton
                 class="w-12 h-12 border-2 border-gray-300 rounded-lg hover:border-sage text-xl justify-center"
@@ -138,56 +188,6 @@
     </div>
   </section>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-import type { Product } from '~~/shared/types/product.types'
-
-const route = useRoute()
-const slug = route.params.slug?.toString().replace(/,/g, '/') ?? ''
-
-const cartStore = useCartStore()
-const toast = useToast()
-const quantity = ref(1)
-
-const { data, error } = await useFetch('/api/products/get-product-by-slug', {
-  params: {
-    slug,
-  },
-})
-const product: Product | null | undefined = data.value?.product
-if (error.value && !product) {
-  console.error(`Error fetching product with slug: ${slug}`, error.value)
-}
-
-function incrementQuantity() {
-  quantity.value++
-}
-
-function decrementQuantity() {
-  if (quantity.value > 1) {
-    quantity.value--
-  }
-}
-
-function handleAddToCart(productData: Product | null | undefined) {
-  if (!productData) {
-    return
-  }
-
-  const productForCart: Omit<CartItem, 'quantity'> = {
-    id: productData.id,
-    name: productData.title,
-    price: productData.price,
-    image: productData.imageLink,
-  }
-
-  for (let i = 0; i < quantity.value; i++) {
-    cartStore.addToCart(productForCart)
-  }
-  toast.add({ title: `${quantity.value} x ${productForCart.name} added to cart`, icon: 'heroicons:check-circle' })
-}
-</script>
 
 <style scoped>
 /* Scoped styles can be added here if needed */

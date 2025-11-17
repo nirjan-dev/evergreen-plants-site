@@ -3,18 +3,18 @@ pre-commit:
     - name: lint
       run: pnpm lint {staged_files}
       glob:
-        - "*.ts"
-        - "*.js"
-        - "*.tsx"
-        - "*.jsx"
-        - "*.json"
-        - "*.css"
-        - "*.html"
+        - '*.ts'
+        - '*.js'
+        - '*.tsx'
+        - '*.jsx'
+        - '*.json'
+        - '*.css'
+        - '*.html'
       stage_fixed: true
     - name: typecheck frontend
       run: pnpm typecheck
       glob:
-        - "*.ts"
-        - "*.js"
-        - "*.tsx"
-        - "*.jsx"
+        - '*.ts'
+        - '*.js'
+        - '*.tsx'
+        - '*.jsx'

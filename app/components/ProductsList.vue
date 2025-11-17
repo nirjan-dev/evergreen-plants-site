@@ -1,3 +1,23 @@
+<script lang="ts" setup>
+import type { Product } from '~~/shared/types/product.types'
+
+defineProps<{
+  products: Product[]
+}>()
+const cartStore = useCartStore()
+const toast = useToast()
+
+function handleAddToCart(product: Product) {
+  cartStore.addToCart({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    image: product.imageLink,
+  })
+  toast.add({ title: `${product.name} added to cart`, icon: 'heroicons:check-circle' })
+}
+</script>
+
 <template>
   <section
     id="plants"
@@ -39,6 +59,7 @@
         >
           <div class="h-64 flex items-center justify-center">
             <img
+              :alt="product.name"
               class="h-full w-full object-cover"
               :src="product.imageLink"
             >
@@ -80,24 +101,3 @@
     </div>
   </section>
 </template>
-
-<script lang="ts" setup>
-import type { Product } from '~~/shared/types/product.types'
-
-const cartStore = useCartStore()
-const toast = useToast()
-
-defineProps<{
-  products: Product[]
-}>()
-
-function handleAddToCart(product: Product) {
-  cartStore.addToCart({
-    id: product.id,
-    name: product.name,
-    price: product.price,
-    image: product.imageLink,
-  })
-  toast.add({ title: `${product.name} added to cart`, icon: 'heroicons:check-circle' })
-}
-</script>

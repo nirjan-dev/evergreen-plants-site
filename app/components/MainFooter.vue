@@ -13,6 +13,7 @@
           </p>
           <div class="flex gap-4">
             <a
+              aria-label="Tiktok"
               href="#"
               class="w-12 h-12  bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition"
             >
@@ -25,6 +26,7 @@
               </svg>
             </a>
             <a
+              aria-label="Facebook"
               href="#"
               class="w-12 h-12  bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition"
             >

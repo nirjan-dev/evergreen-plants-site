@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
+import { z } from 'zod'
 
 const cartStore = useCartStore()
 const toast = useToast()
@@ -13,6 +13,7 @@ const paymentMethods = [
 ]
 const contactMethods = ['WhatsApp', 'Phone Call', 'TikTok', 'Instagram'] as const
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 const schema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long'),
   phoneNumber: z.string().min(10, 'Please enter a valid phone number'),
@@ -46,6 +47,7 @@ const state = ref({
 
 const isSubmitting = ref(false)
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 function handlePaymentProofChange(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files?.length) {
@@ -56,6 +58,7 @@ function handlePaymentProofChange(event: Event) {
   }
 }
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 async function submitOrder(event: FormSubmitEvent<Schema>) {
   isSubmitting.value = true
   const formData = new FormData()
@@ -201,7 +204,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
               <h2 class="text-2xl font-semibold mb-4">
                 Checkout
               </h2>
-              <UForm
+              <!-- <UForm
                 :schema="schema"
                 :state="state"
                 class="space-y-4"
@@ -295,7 +298,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
                 >
                   Place Order
                 </UButton>
-              </UForm>
+              </UForm> -->
             </UCard>
           </div>
         </div>

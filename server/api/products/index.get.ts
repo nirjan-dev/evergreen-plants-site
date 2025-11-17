@@ -1,5 +1,5 @@
-import { getPbClient } from '~~/server/utils/pb'
 import type { BaseProduct } from '~~/shared/types/product.types'
+import { getPbClient } from '~~/server/utils/pb'
 import { getProductImageLink } from '~~/shared/utils/image'
 
 export default defineEventHandler(async () => {
@@ -7,7 +7,7 @@ export default defineEventHandler(async () => {
     const pbClient = await getPbClient()
     const pageResult = await pbClient.collection<BaseProduct>('products').getFullList()
 
-    if (!pageResult) {
+    if (!pageResult.length) {
       throw createError({
         message: 'no products found',
         statusCode: 404,

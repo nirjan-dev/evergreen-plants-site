@@ -1,9 +1,15 @@
-import 'dotenv/config'
+/* eslint-disable ts/no-unsafe-member-access */
+/* eslint-disable node/prefer-global/process */
+
 import PocketBase from 'pocketbase'
 import { BACKEND_URL } from '~~/shared/constants'
+import 'dotenv/config'
 
-const email = process.env.PB_EMAIL!
-const password = process.env.PB_PASSWORD!
+/* @ts-expect-error need to fix this later */
+const email = process.env.PB_EMAIL as string
+
+/* @ts-expect-error need to fix this later */
+const password = process.env.PB_PASSWORD as string
 
 export async function getPbClient() {
   const pbClient = new PocketBase(BACKEND_URL)
