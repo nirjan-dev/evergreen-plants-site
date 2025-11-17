@@ -5,33 +5,73 @@ import { z } from 'zod'
 const cartStore = useCartStore()
 const toast = useToast()
 
-// Checkout Form Logic
-const locations = ['Inside Ring Road', 'Outside Ring Road'] as const
-const paymentMethods = [
-  { label: 'Upload Payment Proof', value: 'payment-proof' },
-  { label: 'Pay on Delivery', value: 'pay-later' },
-]
-const contactMethods = ['WhatsApp', 'Phone Call', 'TikTok', 'Instagram'] as const
+function formatBytes(bytes: number, decimals = 2) {
+  if (bytes === 0)
+    return '0 Bytes'
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
+}
+const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
+const MIN_DIMENSIONS = { width: 200, height: 200 }
+const MAX_DIMENSIONS = { width: 4096, height: 4096 }
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 
-// eslint-disable-next-line unused-imports/no-unused-vars
+// Checkout Form Logic
+const locations = ['Birtamode', 'Damak', 'Chandragadhi', 'Other']
+const paymentMethods = [
+  { label: 'Pay later', value: 'pay-later' },
+  { label: 'Upload Payment Proof', value: 'payment-proof' },
+]
+
 const schema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters long'),
-  phoneNumber: z.string().min(10, 'Please enter a valid phone number'),
-  location: z.enum(['Inside Ring Road', 'Outside Ring Road']),
-  email: z.string().email('Invalid email address').optional().or(z.literal('')),
-  paymentMethod: z.enum(['payment-proof', 'pay-later']),
-  preferredContactMethod: z.enum(['WhatsApp', 'Phone Call', 'TikTok', 'Instagram']),
-  paymentProof: z.custom<File>(f => f instanceof File, 'Please upload your payment screenshot').optional(),
-}).refine((data) => {
-  // If payment method is 'payment-proof', then paymentProof file must be provided.
-  if (data.paymentMethod === 'payment-proof' && !data.paymentProof) {
-    return false
-  }
-  return true
-}, {
-  message: 'Payment proof is required for this payment method.',
-  path: ['paymentProof'], // Path of error
+  name: z.string('Please enter your name').min(1, 'Name must be at least 3 characters long'),
+  phoneNumber: z.string('Please enter your phone number').min(10, 'Please enter a valid phone number'),
+  location: z.enum(locations),
+  email: z.email('Invalid email address').optional().or(z.literal('')),
+  paymentMethod: z.enum(paymentMethods.map(p => p.value)),
+  paymentProof: z.instanceof(File, {
+    message: 'Please upload your payment screenshot',
+  }).optional().refine(file => !file ? true : (file.size <= MAX_FILE_SIZE), {
+    message: `The image is too large. Please choose an image smaller than ${formatBytes(MAX_FILE_SIZE)}.`,
+  }).refine(file => !file ? true : ACCEPTED_IMAGE_TYPES.includes(file.type), {
+    message: 'Please upload a valid image file (JPEG, PNG, or WebP).',
+  }).refine(
+    file => !file
+      ? true
+      : new Promise((resolve) => {
+          const reader = new FileReader()
+          reader.onload = (e) => {
+            const img = new Image()
+            img.onload = () => {
+              const meetsDimensions
+                = img.width >= MIN_DIMENSIONS.width
+                  && img.height >= MIN_DIMENSIONS.height
+                  && img.width <= MAX_DIMENSIONS.width
+                  && img.height <= MAX_DIMENSIONS.height
+              resolve(meetsDimensions)
+            }
+            img.src = e.target?.result as string
+          }
+          reader.readAsDataURL(file)
+        }),
+    {
+      message: `The image dimensions are invalid. Please upload an image between ${MIN_DIMENSIONS.width}x${MIN_DIMENSIONS.height} and ${MAX_DIMENSIONS.width}x${MAX_DIMENSIONS.height} pixels.`,
+    },
+  ),
 })
+  .refine((data) => {
+  // If payment method is 'payment-proof', then paymentProof file must be provided.
+    if (data.paymentMethod === 'payment-proof' && !data.paymentProof) {
+      return false
+    }
+    return true
+  }, {
+    message: 'Payment proof is required for this payment method.',
+    path: ['paymentProof'], // Path of error
+  })
 
 type Schema = z.infer<typeof schema>
 
@@ -41,24 +81,11 @@ const state = ref({
   location: locations[0],
   email: undefined,
   paymentMethod: paymentMethods[1]?.value,
-  preferredContactMethod: contactMethods[0],
   paymentProof: undefined as File | undefined,
 })
 
 const isSubmitting = ref(false)
 
-// eslint-disable-next-line unused-imports/no-unused-vars
-function handlePaymentProofChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  if (target.files?.length) {
-    state.value.paymentProof = target.files[0]
-  }
-  else {
-    state.value.paymentProof = undefined
-  }
-}
-
-// eslint-disable-next-line unused-imports/no-unused-vars
 async function submitOrder(event: FormSubmitEvent<Schema>) {
   isSubmitting.value = true
   const formData = new FormData()
@@ -97,7 +124,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
 
 <template>
   <main class="min-h-[60vh]">
-    <UContainer class="py-12">
+    <UContainer class="py-12 bg-neutral-100">
       <h1 class="text-4xl font-bold text-neutral-900 mb-8">
         Your Shopping Cart
       </h1>
@@ -135,19 +162,21 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
             v-for="item in cartStore.cartItems"
             :key="item.id"
           >
-            <div class="flex gap-4 items-center">
-              <img
-                :src="item.image"
-                :alt="item.name"
-                class="w-24 h-24 object-cover rounded-md"
-              >
-              <div class="flex-1">
-                <h3 class="text-xl font-semibold text-neutral-800">
-                  {{ item.name }}
-                </h3>
-                <p class="text-lg text-primary-700 font-bold">
-                  रू {{ item.price }}
-                </p>
+            <div class="flex flex-wrap gap-4 items-center justify-between">
+              <div class="flex gap-4 items-center">
+                <img
+                  :src="item.image"
+                  :alt="item.name"
+                  class="w-24 h-24 object-cover rounded-md"
+                >
+                <div class="flex-1">
+                  <h3 class="text-xl font-semibold text-neutral-800">
+                    {{ item.name }}
+                  </h3>
+                  <p class="text-lg text-primary-700 font-bold">
+                    रू {{ item.price }}
+                  </p>
+                </div>
               </div>
               <div class="flex items-center gap-3">
                 <UButton
@@ -158,7 +187,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
                   :disabled="item.quantity <= 1"
                   @click="cartStore.updateQuantity(item.id, item.quantity - 1)"
                 />
-                <span class="font-bold text-lg w-8 text-center">{{ item.quantity }}</span>
+                <span class="font-bold text-2xl w-8 text-center">{{ item.quantity }}</span>
                 <UButton
                   icon="i-heroicons-plus"
                   size="sm"
@@ -166,13 +195,14 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
                   variant="outline"
                   @click="cartStore.updateQuantity(item.id, item.quantity + 1)"
                 />
+
+                <UButton
+                  icon="i-heroicons-trash"
+                  color="error"
+                  variant="ghost"
+                  @click="cartStore.removeFromCart(item.id)"
+                />
               </div>
-              <UButton
-                icon="i-heroicons-trash"
-                color="error"
-                variant="ghost"
-                @click="cartStore.removeFromCart(item.id)"
-              />
             </div>
           </UCard>
         </div>
@@ -204,65 +234,58 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
               <h2 class="text-2xl font-semibold mb-4">
                 Checkout
               </h2>
-              <!-- <UForm
+              <UForm
                 :schema="schema"
                 :state="state"
                 class="space-y-4"
                 @submit="submitOrder"
               >
-                <UFormGroup
+                <UFormField
                   label="Full Name"
                   name="name"
                   required
                 >
-                  <UInput v-model="state.name" />
-                </UFormGroup>
-                <UFormGroup
+                  <UInput v-model="state.name" class="w-full" />
+                </UFormField>
+                <UFormField
                   label="Phone Number"
                   name="phoneNumber"
                   required
                 >
-                  <UInput v-model="state.phoneNumber" />
-                </UFormGroup>
-                <UFormGroup
+                  <UInput v-model="state.phoneNumber" class="w-full" />
+                </UFormField>
+                <UFormField
                   label="Location"
                   name="location"
                   required
                 >
                   <USelectMenu
                     v-model="state.location"
-                    :options="locations"
+                    class="w-full"
+                    :items="locations"
                   />
-                </UFormGroup>
-                <UFormGroup
+                </UFormField>
+                <UFormField
                   label="Email (Optional)"
                   name="email"
                 >
                   <UInput
                     v-model="state.email"
+                    class="w-full"
                     placeholder="you@example.com"
                   />
-                </UFormGroup>
-                <UFormGroup
-                  label="Preferred Contact Method"
-                  name="preferredContactMethod"
-                  required
-                >
-                  <USelectMenu
-                    v-model="state.preferredContactMethod"
-                    :options="contactMethods"
-                  />
-                </UFormGroup>
-                <UFormGroup
+                </UFormField>
+
+                <UFormField
                   label="Payment Method"
                   name="paymentMethod"
                   required
                 >
                   <URadioGroup
                     v-model="state.paymentMethod"
-                    :options="paymentMethods"
+                    :items="paymentMethods"
                   />
-                </UFormGroup>
+                </UFormField>
 
                 <div
                   v-if="state.paymentMethod === 'payment-proof'"
@@ -272,21 +295,21 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
                     Please scan the QR code to pay and upload a screenshot of your payment.
                   </p>
                   <img
-                    src="/images/hero.jpg"
+                    src="/images/qr.jpg"
                     alt="Payment QR Code"
                     class="mx-auto rounded-lg"
                   >
-                  <UFormGroup
+                  <UFormField
                     label="Upload Payment Proof"
                     name="paymentProof"
                     required
                   >
-                    <UInput
-                      type="file"
+                    <UFileUpload
+                      v-model="state.paymentProof"
+                      size="xl"
                       accept="image/*"
-                      @change="handlePaymentProofChange"
                     />
-                  </UFormGroup>
+                  </UFormField>
                 </div>
 
                 <UButton
@@ -298,7 +321,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
                 >
                   Place Order
                 </UButton>
-              </UForm> -->
+              </UForm>
             </UCard>
           </div>
         </div>
