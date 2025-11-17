@@ -13,7 +13,7 @@ const password = process.env.PB_PASSWORD as string
 
 export async function getPbClient() {
   const pbClient = new PocketBase(BACKEND_URL)
-  pbClient.autoCancellation(false)
+  // pbClient.autoCancellation(false)
   await pbClient.collection('_superusers').authWithPassword(email, password, {
     autoRefreshThreshold: 30 * 60, // 30 minutes
   })

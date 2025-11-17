@@ -1,117 +1,127 @@
-// import { z } from 'zod'
-// import { getPbClient } from '../../utils/pb'
+import { createError, defineEventHandler, readMultipartFormData, setResponseStatus } from 'h3'
+import { z } from 'zod'
+import { getPbClient } from '~~/server/utils/pb'
 
-// Define Zod schema for validating the incoming form data.
-// Note: All values from FormData are initially strings.
-// const OrderSchema = z.object({
-//   name: z.string().min(3, 'Name must be at least 3 characters'),
-//   phoneNumber: z.string().min(10, 'Please enter a valid 10-digit phone number'),
-//   location: z.enum(['Inside Ring Road', 'Outside Ring Road']),
-//   email: z.string().email('Invalid email address').optional().or(z.literal('')),
-//   paymentMethod: z.enum(['payment-proof', 'pay-later']),
-//   preferredContactMethod: z.enum(['WhatsApp', 'Phone Call', 'TikTok', 'Instagram']),
-//   cartItems: z.string().transform(val => JSON.parse(val)), // The cart items will be a JSON string
-//   totalPrice: z.string().transform(val => Number(val)), // Total price will be a string
-// })
+// This schema validates the JSON data we expect in the 'order' part of the multipart form data.
+// It includes both the customer details from the form and the cart details.
+const orderSchema = z.object({
+  name: z.string('Name is required.').min(1, 'Name is required.'),
+  phoneNumber: z.string('Phone number is required.').min(10, 'A valid phone number is required.'),
+  location: z.string(),
+  customLocation: z.string().optional(),
+  email: z.email('Invalid email address.').optional().or(z.literal('')),
+  paymentMethod: z.enum(['pay-later', 'payment-proof']),
 
-export default defineEventHandler(async (_event) => {
-  // const multipartData = await readMultipaRtFormData(event)
+  // Cart details that must be sent from the frontend
+  cartItems: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    price: z.number(),
+    quantity: z.number().min(1),
+    image: z.string(),
+  })).min(1, 'Cannot place an order with an empty cart.'),
 
-  // if (!multipartData) {
-  //   throw createError({ statusCode: 400, statusMessage: 'Missing form data.' })
-  // }
+  totalPrice: z.number(),
+  deliveryCost: z.number(),
+  totalPriceWithDelivery: z.number(),
+})
 
-  // // Prepare an object to hold the form fields and a variable for the file.
-  // const rawData: Record<string, string> = {}
-  // let paymentProofFile: Blob | undefined
-  // let paymentProofFilename: string | undefined
+export default defineEventHandler(async (event) => {
+  try {
+    const parts = await readMultipartFormData(event)
 
-  // // Iterate over multipart data to separate files from fields.
-  // for (const part of multipartData) {
-  //   const name = part.name
-  //   if (!name)
-  //     continue
+    if (!parts) {
+      throw createError({ statusCode: 400, message: 'Invalid form data.' })
+    }
 
-  //   if (part.filename) {
-  //     // This part is a file
-  //     if (name === 'paymentProof') {
-  //       paymentProofFile = new Blob([part.data], { type: part.type })
-  //       paymentProofFilename = part.filename
-  //     }
-  //   }
-  //   else {
-  //     // This part is a regular form field
-  //     rawData[name] = part.data.toString()
-  //   }
-  // }
+    // Find the 'order' data part, which should be a JSON string
+    const orderDataPart = parts.find(p => p.name === 'order')
+    if (orderDataPart === undefined || typeof orderDataPart.data !== 'object') {
+      throw createError({ statusCode: 400, message: 'Order data is missing.' })
+    }
 
-  // // Validate the text-based fields using Zod.
-  // const validation = OrderSchema.safeParse(rawData)
+    // Parse and validate the order data against our schema
+    // eslint-disable-next-line ts/no-unsafe-assignment, ts/no-unsafe-argument, ts/no-unsafe-call, ts/no-unsafe-member-access
+    const orderPayload = JSON.parse(orderDataPart.data.toString())
 
-  // if (!validation.success) {
-  //   // If validation fails, throw a structured error.
-  //   throw createError({
-  //     statusCode: 400,
-  //     statusMessage: 'Invalid order data.',
-  //     data: validation.error.flatten().fieldErrors,
-  //   })
-  // }
+    const validation = await orderSchema.safeParseAsync(orderPayload)
 
-  // const { paymentMethod } = validation.data
+    if (validation.error) {
+      const errors = validation.error.issues
+      throw createError({
+        statusCode: 400,
+        message: 'Invalid data provided.',
+        data: errors,
+        cause: validation.error.cause,
+      })
+    }
 
-  // // Manually validate that the payment proof file exists if that payment method was chosen.
-  // if (paymentMethod === 'payment-proof' && !paymentProofFile) {
-  //   throw createError({
-  //     statusCode: 400,
-  //     statusMessage: 'Payment proof is required.',
-  //     data: { paymentProof: ['Please upload a screenshot of your payment.'] },
-  //   })
-  // }
+    const {
+      name,
+      phoneNumber,
+      location,
+      customLocation,
+      email,
+      cartItems,
+      totalPriceWithDelivery,
+    } = validation.data
 
-  // try {
-  //   const pb = await getPbClient()
+    const pb = await getPbClient()
+    const pbFormData = new FormData()
 
-  //   // We must use FormData to create a record in PocketBase when a file is included.
-  //   const pbFormData = new FormData()
+    // Append customer and order details
+    pbFormData.append('customer_name', name)
+    pbFormData.append('customer_phone', phoneNumber)
+    pbFormData.append('location', location)
+    if (typeof customLocation === 'string') {
+      pbFormData.append('custom_location', customLocation)
+    }
+    if (typeof email === 'string') {
+      pbFormData.append('customer_email', email)
+    }
 
-  //   // Append the validated data to the FormData object for PocketBase.
-  //   // The field names here must match the collection schema in your PocketBase.
-  //   pbFormData.append('customer_name', validation.data.name)
-  //   pbFormData.append('customer_phone', validation.data.phoneNumber)
-  //   pbFormData.append('customer_location', validation.data.location)
-  //   pbFormData.append('customer_email', validation.data.email || '')
-  //   pbFormData.append('preferred_contact_method', validation.data.preferredContactMethod)
-  //   pbFormData.append('payment_method', validation.data.paymentMethod)
-  //   pbFormData.append('total_price', validation.data.totalPrice.toString())
-  //   pbFormData.append('order_items', JSON.stringify(validation.data.cartItems))
-  //   pbFormData.append('status', 'pending') // Set the initial order status.
+    const orderDetails = {
+      items: cartItems.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        item_total: item.price * item.quantity,
+      })),
+    }
 
-  //   // If a payment proof file was uploaded, append it to the form data.
-  //   if (paymentProofFile && paymentProofFilename) {
-  //     pbFormData.append('payment_proof', paymentProofFile, paymentProofFilename)
-  //   }
+    pbFormData.append('order_details', JSON.stringify(orderDetails))
+    pbFormData.append('total', String(totalPriceWithDelivery))
+    pbFormData.append('items', String(cartItems.reduce((sum, item) => sum + item.quantity, 0)))
+    pbFormData.append('status', 'unconfirmed')
 
-  //   // Create the new record in the 'orders' collection.
-  //   const newOrder = await pb.collection('orders').create(pbFormData)
+    // Find and append the payment proof file if it exists
+    const paymentProofPart = parts.find(p => p.name === 'paymentProof' && (typeof p.filename === 'string'))
+    if (paymentProofPart) {
+      const fileBlob = new Blob([paymentProofPart.data], { type: paymentProofPart.type })
+      pbFormData.append('payment_proof', fileBlob, paymentProofPart.filename)
+    }
 
-  //   return {
-  //     success: true,
-  //     orderId: newOrder.id,
-  //   }
-  // }
-  // catch (error) {
-  //   console.error('Order creation failed:', error)
-  //   const data = (error as any)?.data || { message: 'An internal server error occurred.' }
-  //   // If something goes wrong with PocketBase, throw a 500 error.
-  //   throw createError({
-  //     statusCode: 500,
-  //     statusMessage: 'Could not create the order.',
-  //     // Pass along PocketBase's error data if available.
-  //     data,
-  //   })
-  // }
-  return {
-    statusCode: 201,
-    message: 'TODO: implement create order endpoint',
+    const response = await pb.collection('orders').create(pbFormData)
+
+    setResponseStatus(event, 201)
+    return {
+      message: 'Order created successfully!',
+      data: response,
+    }
+  }
+  catch (error: unknown) {
+    // Re-throw H3 errors to let Nitro handle them
+    if (typeof error === 'object' && error !== null && 'statusCode' in error) {
+      throw error
+    }
+
+    // Log unexpected errors for debugging
+    console.error('Error creating order:', error)
+
+    // Send a generic 500 error for all other cases
+    throw createError({
+      statusCode: 500,
+      message: 'An unexpected error occurred while processing your order.',
+    })
   }
 })

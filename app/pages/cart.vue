@@ -39,7 +39,7 @@ const schema = z.object({
   phoneNumber: z.string('Please enter your phone number').min(10, 'Please enter a valid phone number'),
   location: z.enum(locations as [string, ...string[]]),
   customLocation: z.string().optional(),
-  email: z.email('Invalid email address').optional().or(z.literal('')),
+  email: z.string().email('Invalid email address').optional().or(z.literal('')),
   paymentMethod: z.enum(paymentMethods.map(p => p.value) as [string, ...string[]]),
   paymentProof: z.instanceof(File, {
     message: 'Please upload your payment screenshot',
@@ -132,10 +132,31 @@ const isSubmitting = ref(false)
 async function submitOrder(event: FormSubmitEvent<Schema>) {
   isSubmitting.value = true
 
+  const formData = new FormData()
+  const paymentProofFile = event.data.paymentProof
+
+  // Create the order data payload, excluding the file
+  const orderPayload = {
+    ...event.data,
+    paymentProof: undefined, // Remove file from JSON payload
+    cartItems: cartStore.cartItems,
+    totalPrice: cartStore.totalPrice,
+    deliveryCost: deliveryCost.value,
+    totalPriceWithDelivery: totalPriceWithDelivery.value,
+  }
+
+  // Append the JSON data as a string
+  formData.append('order', JSON.stringify(orderPayload))
+
+  // Append the file if it exists
+  if (paymentProofFile) {
+    formData.append('paymentProof', paymentProofFile, paymentProofFile.name)
+  }
+
   try {
     await $fetch('/api/orders/create', {
       method: 'POST',
-      body: event.data,
+      body: formData, // Send the FormData object,
     })
     cartStore.clearCart()
     resetForm()
@@ -227,7 +248,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
 
                 <UButton
                   icon="i-heroicons-trash"
-                  color="red"
+                  color="error"
                   variant="ghost"
                   @click="cartStore.removeFromCart(item.id)"
                 />
@@ -394,7 +415,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
         </div>
       </div>
 
-      <UModal v-model:open="isSuccessModalOpen">
+      <UModal v-model="isSuccessModalOpen">
         <template #content>
           <UCard>
             <div class="p-4 text-center">
