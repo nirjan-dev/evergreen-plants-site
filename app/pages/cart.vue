@@ -25,13 +25,22 @@ const paymentMethods = [
   { label: 'Pay later', value: 'pay-later' },
   { label: 'Upload Payment Proof', value: 'payment-proof' },
 ]
+const deliveryCosts = {
+  Birtamode: 100,
+  Damak: 150,
+  Chandragadhi: 120,
+  Other: 0,
+} as const
+
+const isSuccessModalOpen = ref(false)
 
 const schema = z.object({
   name: z.string('Please enter your name').min(1, 'Name must be at least 3 characters long'),
   phoneNumber: z.string('Please enter your phone number').min(10, 'Please enter a valid phone number'),
-  location: z.enum(locations),
+  location: z.enum(locations as [string, ...string[]]),
+  customLocation: z.string().optional(),
   email: z.email('Invalid email address').optional().or(z.literal('')),
-  paymentMethod: z.enum(paymentMethods.map(p => p.value)),
+  paymentMethod: z.enum(paymentMethods.map(p => p.value) as [string, ...string[]]),
   paymentProof: z.instanceof(File, {
     message: 'Please upload your payment screenshot',
   }).optional().refine(file => !file ? true : (file.size <= MAX_FILE_SIZE), {
@@ -72,6 +81,15 @@ const schema = z.object({
     message: 'Payment proof is required for this payment method.',
     path: ['paymentProof'], // Path of error
   })
+  .refine((data) => {
+    if (data.location === 'Other') {
+      return data.customLocation && data.customLocation.length > 0
+    }
+    return true
+  }, {
+    message: 'Please enter your specific location.',
+    path: ['customLocation'],
+  })
 
 type Schema = z.infer<typeof schema>
 
@@ -79,38 +97,49 @@ const state = ref({
   name: undefined,
   phoneNumber: undefined,
   location: locations[0],
+  customLocation: undefined,
   email: undefined,
   paymentMethod: paymentMethods[1]?.value,
   paymentProof: undefined as File | undefined,
 })
 
+const deliveryCost = computed(() => {
+  return deliveryCosts[state.value.location as keyof typeof deliveryCosts] || 0
+})
+
+const totalPriceWithDelivery = computed(() => {
+  return cartStore.totalPrice + deliveryCost.value
+})
+
+function resetForm() {
+  state.value = {
+    name: undefined,
+    phoneNumber: undefined,
+    location: locations[0],
+    customLocation: undefined,
+    email: undefined,
+    paymentMethod: paymentMethods[1]?.value,
+    paymentProof: undefined as File | undefined,
+  }
+}
+
+function handleFormError() {
+  toast.add({ title: 'Error', description: 'Please fill out all required fields correctly.', icon: 'i-heroicons-exclamation-circle', color: 'error' })
+}
+
 const isSubmitting = ref(false)
 
 async function submitOrder(event: FormSubmitEvent<Schema>) {
   isSubmitting.value = true
-  const formData = new FormData()
-
-  // Append all form fields to FormData
-  Object.entries(event.data).forEach(([key, value]) => {
-    if (value) {
-      formData.append(key, value)
-    }
-  })
-
-  // Append cart data
-  formData.append('cartItems', JSON.stringify(cartStore.cartItems))
-  formData.append('totalPrice', cartStore.totalPrice.toString())
 
   try {
     await $fetch('/api/orders/create', {
       method: 'POST',
-      body: formData,
+      body: event.data,
     })
-
-    toast.add({ title: 'Order Placed Successfully!', description: 'We will contact you shortly.', icon: 'i-heroicons-check-circle', color: 'success' })
     cartStore.clearCart()
-    // Optionally redirect to a success page
-    // await navigateTo('/order-success');
+    resetForm()
+    isSuccessModalOpen.value = true
   }
   catch (error) {
     const message = (error as any)?.data?.message || 'An unexpected error occurred.'
@@ -143,7 +172,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
               Your cart is empty.
             </p>
             <UButton
-              to="/"
+              to="/#plants"
               label="Continue Shopping"
               size="lg"
               icon="i-heroicons-arrow-left"
@@ -198,7 +227,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
 
                 <UButton
                   icon="i-heroicons-trash"
-                  color="error"
+                  color="red"
                   variant="ghost"
                   @click="cartStore.removeFromCart(item.id)"
                 />
@@ -221,11 +250,18 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
                 </div>
                 <div class="flex justify-between text-lg text-gray-500">
                   <span>Delivery Cost</span>
-                  <span class="font-semibold">TBD</span>
+                  <span
+                    v-if="state.location !== 'Other'"
+                    class="font-semibold"
+                  >रू {{ deliveryCost.toFixed(2) }}</span>
+                  <span
+                    v-else
+                    class="font-semibold"
+                  >TBD</span>
                 </div>
                 <div class="flex justify-between text-xl font-bold border-t pt-2 mt-2">
                   <span>Total</span>
-                  <span>रू {{ cartStore.totalPrice.toFixed(2) }}</span>
+                  <span>रू {{ totalPriceWithDelivery.toFixed(2) }}</span>
                 </div>
               </div>
             </UCard>
@@ -239,6 +275,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
                 :state="state"
                 class="space-y-4"
                 @submit="submitOrder"
+                @error="handleFormError"
               >
                 <UFormField
                   label="Full Name"
@@ -265,6 +302,31 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
                     :items="locations"
                   />
                 </UFormField>
+
+                <div
+                  v-if="state.location === 'Other'"
+                  class="space-y-3"
+                >
+                  <UAlert
+                    icon="i-heroicons-information-circle"
+                    color="primary"
+                    variant="subtle"
+                    title="Special Delivery Note"
+                    description="We only deliver to other locations for special cases. We will call you to confirm the order and calculate the full delivery price."
+                  />
+                  <UFormField
+                    label="Your Location"
+                    name="customLocation"
+                    required
+                  >
+                    <UInput
+                      v-model="state.customLocation"
+                      class="w-full"
+                      placeholder="Enter your city/area"
+                    />
+                  </UFormField>
+                </div>
+
                 <UFormField
                   label="Email (Optional)"
                   name="email"
@@ -312,6 +374,11 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
                   </UFormField>
                 </div>
 
+                <div class="flex justify-between text-xl font-bold border-t pt-2 mt-2">
+                  <span>Total</span>
+                  <span>रू {{ totalPriceWithDelivery.toFixed(2) }}</span>
+                </div>
+
                 <UButton
                   type="submit"
                   block
@@ -326,6 +393,37 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
           </div>
         </div>
       </div>
+
+      <UModal v-model:open="isSuccessModalOpen">
+        <template #content>
+          <UCard>
+            <div class="p-4 text-center">
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="text-6xl text-green-500 mx-auto"
+              />
+              <h2 class="text-2xl font-semibold mt-4">
+                Order Placed Successfully!
+              </h2>
+              <p class="text-gray-600 mt-2">
+                We will call you soon to confirm the order.
+              </p>
+              <div class="mt-6 flex justify-center gap-4">
+                <UButton
+                  label="Continue Shopping"
+                  to="/#plants"
+                  @click="isSuccessModalOpen = false"
+                />
+                <UButton
+                  variant="outline"
+                  label="Close"
+                  @click="isSuccessModalOpen = false"
+                />
+              </div>
+            </div>
+          </UCard>
+        </template>
+      </UModal>
     </UContainer>
   </main>
 </template>
