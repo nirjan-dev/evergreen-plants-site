@@ -415,7 +415,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
         </div>
       </div>
 
-      <UModal v-model="isSuccessModalOpen">
+      <UModal v-model:open="isSuccessModalOpen">
         <template #content>
           <UCard>
             <div class="p-4 text-center">
