@@ -63,6 +63,7 @@ export default defineEventHandler(async (event) => {
       customLocation,
       email,
       cartItems,
+      deliveryCost,
       totalPriceWithDelivery,
     } = validation.data
 
@@ -80,16 +81,46 @@ export default defineEventHandler(async (event) => {
       pbFormData.append('customer_email', email)
     }
 
-    const orderDetails = {
-      items: cartItems.map(item => ({
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-        item_total: item.price * item.quantity,
-      })),
-    }
-
-    pbFormData.append('order_details', JSON.stringify(orderDetails))
+    const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+    const orderDetailsHtml = `
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${cartItems
+            .map(
+              (item) => {
+                return `
+            <tr>
+              <td>${item.name}</td>
+              <td>${item.quantity}</td>
+              <td>${item.price}</td>
+            </tr>
+          `
+              },
+            )
+            .join('')}
+          <tr>
+            <td>Delivery</td>
+            <td>-</td>
+            <td>${deliveryCost}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td><strong>${totalQuantity}</strong></td>
+            <td><strong>${totalPriceWithDelivery}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    `
+    pbFormData.append('order_details', orderDetailsHtml)
     pbFormData.append('total', String(totalPriceWithDelivery))
     pbFormData.append('items', String(cartItems.reduce((sum, item) => sum + item.quantity, 0)))
     pbFormData.append('status', 'unconfirmed')
