@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 const cartStore = useCartStore()
 const toast = useToast()
+const { proxy } = useScriptClarity()
 
 function formatBytes(bytes: number, decimals = 2) {
   if (bytes === 0)
@@ -129,6 +130,10 @@ function handleFormError() {
 
 const isSubmitting = ref(false)
 
+function sendConversion() {
+  proxy.clarity('event', 'conversion')
+}
+
 async function submitOrder(event: FormSubmitEvent<Schema>) {
   isSubmitting.value = true
 
@@ -161,6 +166,7 @@ async function submitOrder(event: FormSubmitEvent<Schema>) {
     cartStore.clearCart()
     resetForm()
     isSuccessModalOpen.value = true
+    sendConversion()
   }
   catch (error) {
     const message = (error as any)?.data?.message || 'An unexpected error occurred.'

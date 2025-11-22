@@ -11,6 +11,23 @@ export default defineNuxtConfig({
     '@nuxt/test-utils',
     '@nuxt/ui',
   ],
+  // scripts: {
+  //   registry: {
+  //     clarity: {
+  //       id: 'u9xeg1dj7w',
+  //     },
+  //   },
+  // },
+  $production: {
+
+    scripts: {
+      registry: {
+        clarity: {
+          id: 'u9xeg1dj7w',
+        },
+      },
+    },
+  },
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   ui: {
