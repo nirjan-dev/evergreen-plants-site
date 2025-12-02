@@ -105,7 +105,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
               </h3>
               <div class="space-y-6">
                 <div class="flex items-start gap-4">
-                  <div class="w-12 h-12 bg-sage rounded-full flex items-center justify-center flex-shrink-0">
+                  <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <svg class="w-6 h-6 text-neutral-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -122,7 +122,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
                 </div>
 
                 <div class="flex items-start gap-4">
-                  <div class="w-12 h-12 bg-sage rounded-full flex items-center justify-center flex-shrink-0">
+                  <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <svg class="w-6 h-6 text-neutral-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
@@ -132,13 +132,13 @@ async function submit(event: FormSubmitEvent<Schema>) {
                       Phone
                     </h4>
                     <p class="text-lg text-neutral-600">
-                      +977 98XXXXXXXX
+                      +977 9827949279
                     </p>
                   </div>
                 </div>
 
                 <div class="flex items-start gap-4">
-                  <div class="w-12 h-12 bg-sage rounded-full flex items-center justify-center flex-shrink-0">
+                  <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <svg class="w-6 h-6 text-neutral-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -162,7 +162,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
               <p class="text-lg text-neutral-600 mb-6">
                 Check out our plant care tips, new arrivals, and behind-the-scenes content!
               </p>
-              <UButton size="xl" to="#">
+              <UButton size="xl" to="https://www.tiktok.com/@evergreen.plant.n">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1.04-.1z" />
                 </svg>

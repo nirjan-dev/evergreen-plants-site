@@ -2,7 +2,7 @@
   <!-- FOOTER -->
   <footer class="bg-primary-100 py-16">
     <div class="max-w-7xl mx-auto px-6">
-      <div class="grid md:grid-cols-4 gap-12 mb-12">
+      <div class="grid md:grid-cols-3 gap-12 mb-12">
         <!-- About Column -->
         <div>
           <h3 class="text-2xl font-bold mb-4">
@@ -14,7 +14,9 @@
           <div class="flex gap-4">
             <a
               aria-label="Tiktok"
-              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.tiktok.com/@evergreen.plant.n"
               class="w-12 h-12  bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition"
             >
               <svg
@@ -27,7 +29,9 @@
             </a>
             <a
               aria-label="Facebook"
-              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.facebook.com/people/Evergreen-Plant-Nursery/61567729048268/"
               class="w-12 h-12  bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition"
             >
               <svg
@@ -75,7 +79,7 @@
         </div>
 
         <!-- Categories Column -->
-        <div>
+        <!-- <div>
           <h4 class="text-xl font-bold mb-4">
             Categories
           </h4>
@@ -105,7 +109,7 @@
               >Flowering Plants</a>
             </li>
           </ul>
-        </div>
+        </div> -->
 
         <!-- Contact Column -->
         <div>
@@ -115,7 +119,7 @@
           <ul class="space-y-3 text-lg opacity-90">
             <li>Chandragadhi, Jhapa</li>
             <li>Province 1, Nepal</li>
-            <li>+977 98XXXXXXXX</li>
+            <li>+977 9827949279</li>
             <li>Sun-Fri: 8AM - 6PM</li>
           </ul>
         </div>
